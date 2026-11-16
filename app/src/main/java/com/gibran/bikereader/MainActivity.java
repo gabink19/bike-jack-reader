@@ -19,12 +19,24 @@ import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public final class MainActivity extends Activity implements AudioPulseReader.Listener {
 
     private static final int REQ_AUDIO = 1;
     private static final long FRAME_MS = 50;
+    /** Cek update otomatis paling sering tiap 6 jam (batas API GitHub tanpa login: 60/jam per IP). */
+    private static final long AUTO_CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000L;
+
+    private final ExecutorService bg = Executors.newSingleThreadExecutor();
+    private UpdateInstaller updateInstaller;
+    private UpdateChecker.UpdateInfo pendingUpdate;
+    private boolean checkingUpdate;
+    private Button btnUpdateBanner;
+    private TextView tvVersion;
 
     private final Handler ui = new Handler(Looper.getMainLooper());
     private final PulseDetector detector = new PulseDetector(44100);
@@ -82,6 +94,85 @@ public final class MainActivity extends Activity implements AudioPulseReader.Lis
 
         bindViews();
         setupSettings();
+        setupUpdates();
+    }
+
+    // ---- Update dari GitHub Releases ----
+
+    private void setupUpdates() {
+        btnUpdateBanner = findViewById(R.id.btnUpdateBanner);
+        tvVersion = findViewById(R.id.tvVersion);
+        tvVersion.setText("Versi terpasang: " + BuildConfig.VERSION_NAME);
+        // Status unduhan juga ditulis di banner, karena panel pengaturan biasanya tertutup.
+        updateInstaller = new UpdateInstaller(this, msg -> {
+            tvVersion.setText(msg);
+            if (btnUpdateBanner.getVisibility() == View.VISIBLE) {
+                btnUpdateBanner.setText(msg);
+            }
+        });
+        updateInstaller.register();
+
+        btnUpdateBanner.setOnClickListener(v -> {
+            if (pendingUpdate != null && !updateInstaller.isDownloading()) {
+                updateInstaller.start(pendingUpdate);
+            }
+        });
+        findViewById(R.id.btnCheckUpdate).setOnClickListener(v -> checkForUpdate(true));
+
+        long last = getSharedPreferences("update", MODE_PRIVATE).getLong("lastCheck", 0);
+        if (System.currentTimeMillis() - last > AUTO_CHECK_INTERVAL_MS) {
+            checkForUpdate(false);
+        }
+    }
+
+    private void checkForUpdate(boolean manual) {
+        if (checkingUpdate) return;
+        checkingUpdate = true;
+        if (manual) tvVersion.setText("Mengecek update...");
+        bg.execute(() -> {
+            UpdateChecker.UpdateInfo info = null;
+            String error = null;
+            try {
+                info = UpdateChecker.check(BuildConfig.UPDATE_REPO, BuildConfig.VERSION_CODE, BuildConfig.VERSION_NAME);
+            } catch (IOException e) {
+                error = e.getMessage();
+            }
+            final UpdateChecker.UpdateInfo result = info;
+            final String err = error;
+            ui.post(() -> {
+                checkingUpdate = false;
+                if (isDestroyed()) return;
+                if (err == null) {
+                    getSharedPreferences("update", MODE_PRIVATE).edit()
+                            .putLong("lastCheck", System.currentTimeMillis()).apply();
+                }
+                showUpdateResult(result, err, manual);
+            });
+        });
+    }
+
+    private void showUpdateResult(UpdateChecker.UpdateInfo info, String error, boolean manual) {
+        pendingUpdate = info;
+        if (info != null) {
+            btnUpdateBanner.setText("Update tersedia: " + info.tag + " — ketuk untuk pasang");
+            btnUpdateBanner.setVisibility(View.VISIBLE);
+            tvVersion.setText("Versi terpasang: " + BuildConfig.VERSION_NAME + "  ·  terbaru: " + info.tag);
+        } else {
+            btnUpdateBanner.setVisibility(View.GONE);
+            if (error != null) {
+                // Cek otomatis yang gagal (misal offline) tidak perlu mengganggu pengguna.
+                if (manual) tvVersion.setText("Gagal cek update: " + error);
+            } else if (manual) {
+                tvVersion.setText("Versi terpasang: " + BuildConfig.VERSION_NAME + "  ·  sudah terbaru");
+            }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        updateInstaller.unregister();
+        bg.shutdownNow();
+        super.onDestroy();
     }
 
     private void bindViews() {

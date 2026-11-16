@@ -19,6 +19,8 @@
     <string name="in_jack">Jack</string>
     <string name="in_usb">USB-C</string>
     <string name="in_mic">Mic HP</string>
+    <string name="set_update">Update aplikasi</string>
+    <string name="check_update">Cek update</string>
     <string name="set_threshold">Ambang deteksi</string>
     <string name="set_polarity">Polaritas pulsa</string>
     <string name="pol_both">Dua arah</string>

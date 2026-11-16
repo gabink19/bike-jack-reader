@@ -16,6 +16,13 @@ android {
         // Build dari tag (misal v0.1) memakai nama tag tanpa "v"; build biasa diberi akhiran -dev.
         def tagName = System.getenv('GITHUB_REF_TYPE') == 'tag' ? System.getenv('GITHUB_REF_NAME') : null
         versionName tagName ? tagName.replaceFirst('^v', '') : "0.1-dev.${runNumber}"
+        // Repo sumber update in-app; di CI otomatis mengikuti repo yang mem-build (berguna untuk fork).
+        def updateRepo = System.getenv('GITHUB_REPOSITORY') ?: 'gabink19/bike-jack-reader'
+        buildConfigField 'String', 'UPDATE_REPO', "\"${updateRepo}\""
+    }
+
+    buildFeatures {
+        buildConfig true
     }
 
     // Kunci tanda tangan dibaca dari environment (GitHub Secrets), tidak pernah disimpan di repo.

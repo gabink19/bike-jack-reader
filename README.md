@@ -77,6 +77,19 @@ sebagian HP, coba pilihan lain atau cabut kabel lain yang terpasang.
 
 Kalori dihitung dengan rumus MET berdasarkan kecepatan dan berat badan; ini perkiraan kasar.
 
+## Update dari dalam aplikasi
+
+Aplikasi mengecek GitHub Releases saat dibuka (paling sering tiap 6 jam), atau manual lewat
+**Pengaturan → Cek update**. Jika ada release lebih baru, muncul tombol hijau
+**Update tersedia**: ketuk, APK diunduh, lalu layar pemasangan Android terbuka.
+
+- Pertama kali, Android meminta izin **Instal aplikasi tidak dikenal** untuk Bike Jack Reader.
+  Izinkan, kembali ke aplikasi, lalu ketuk Update lagi.
+- Hanya **release** (tag `v*`) yang ditawarkan, bukan build biasa dari `main`.
+- Update hanya bisa menimpa versi terpasang jika ditandatangani kunci yang sama
+  (`bike.jks` di Secrets). Jangan ganti keystore.
+- Repo harus **public**, karena aplikasi mengakses GitHub tanpa login.
+
 ## Build lewat GitHub
 
 Workflow ada di `.github/workflows/android.yml`:

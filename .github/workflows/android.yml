@@ -49,10 +49,18 @@ jobs:
       - name: Rename APK
         run: cp app/build/outputs/apk/release/app-release.apk BikeJackReader.apk
 
+      # Dibaca fitur update in-app untuk membandingkan versionCode (sama dengan GITHUB_RUN_NUMBER di app/build.gradle).
+      - name: Write version info
+        run: |
+          printf '{"versionCode": %s, "versionName": "%s"}\n' "$GITHUB_RUN_NUMBER" "${GITHUB_REF_NAME#v}" > version.json
+          cat version.json
+
       - uses: actions/upload-artifact@v7
         with:
           name: BikeJackReader-apk
-          path: BikeJackReader.apk
+          path: |
+            BikeJackReader.apk
+            version.json
           retention-days: 14
 
       - name: Remove signing key
@@ -72,4 +80,6 @@ jobs:
           name: BikeJackReader-apk
       - uses: softprops/action-gh-release@v3
         with:
-          files: BikeJackReader.apk
+          files: |
+            BikeJackReader.apk
+            version.json
