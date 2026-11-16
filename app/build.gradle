@@ -13,7 +13,9 @@ android {
         // Nomor build GitHub Actions dipakai sebagai versionCode agar tiap build bisa di-install sebagai update.
         def runNumber = (System.getenv('GITHUB_RUN_NUMBER') ?: '1') as int
         versionCode runNumber
-        versionName "1.0.${runNumber}"
+        // Build dari tag (misal v0.1) memakai nama tag tanpa "v"; build biasa diberi akhiran -dev.
+        def tagName = System.getenv('GITHUB_REF_TYPE') == 'tag' ? System.getenv('GITHUB_REF_NAME') : null
+        versionName tagName ? tagName.replaceFirst('^v', '') : "0.1-dev.${runNumber}"
     }
 
     // Kunci tanda tangan dibaca dari environment (GitHub Secrets), tidak pernah disimpan di repo.
