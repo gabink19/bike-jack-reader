@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name"
+            android:textColor="@color/text"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:textColor="@color/muted"
+            android:textSize="13sp" />
+
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="2">
+
+            <LinearLayout style="@style/Card">
+                <TextView style="@style/Label" android:text="@string/lbl_speed" />
+                <TextView android:id="@+id/valSpeed" style="@style/Value" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/Card">
+                <TextView style="@style/Label" android:text="@string/lbl_rpm" />
+                <TextView android:id="@+id/valRpm" style="@style/Value" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/Card">
+                <TextView style="@style/Label" android:text="@string/lbl_distance" />
+                <TextView android:id="@+id/valDistance" style="@style/Value" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/Card">
+                <TextView style="@style/Label" android:text="@string/lbl_time" />
+                <TextView android:id="@+id/valTime" style="@style/Value" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/Card">
+                <TextView style="@style/Label" android:text="@string/lbl_kcal" />
+                <TextView android:id="@+id/valKcal" style="@style/Value" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/Card">
+                <TextView style="@style/Label" android:text="@string/lbl_avg" />
+                <TextView android:id="@+id/valAvg" style="@style/Value" />
+            </LinearLayout>
+        </GridLayout>
+
+        <TextView
+            android:id="@+id/tvExtra"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="@color/muted"
+            android:textSize="13sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnStart"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="2"
+                android:backgroundTint="@color/accent"
+                android:text="@string/start"
+                android:textColor="#FF000000"
+                android:textSize="18sp" />
+
+            <Button
+                android:id="@+id/btnReset"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:text="@string/reset"
+                android:textSize="18sp" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/lbl_signal"
+            android:textColor="@color/text"
+            android:textStyle="bold" />
+
+        <com.gibran.bikereader.WaveformView
+            android:id="@+id/waveform"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:layout_marginTop="4dp" />
+
+        <TextView
+            android:id="@+id/tvLevel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/muted"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/btnSettings"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="12dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:gravity="center_vertical"
+            android:text="@string/settings_show"
+            android:textColor="@color/accent"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:id="@+id/settingsPanel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView style="@style/SettingLabel" android:text="@string/set_threshold" android:id="@+id/tvThreshold" />
+            <SeekBar
+                android:id="@+id/sbThreshold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="95"
+                android:min="1" />
+
+            <TextView style="@style/SettingLabel" android:text="@string/set_polarity" />
+            <RadioGroup
+                android:id="@+id/rgPolarity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <RadioButton android:id="@+id/rbBoth" style="@style/Radio" android:text="@string/pol_both" />
+                <RadioButton android:id="@+id/rbPos" style="@style/Radio" android:text="@string/pol_pos" />
+                <RadioButton android:id="@+id/rbNeg" style="@style/Radio" android:text="@string/pol_neg" />
+            </RadioGroup>
+
+            <TextView style="@style/SettingLabel" android:text="@string/set_meters" />
+            <EditText android:id="@+id/etMeters" style="@style/Input" android:inputType="numberDecimal" />
+
+            <TextView style="@style/SettingLabel" android:text="@string/set_pulses" />
+            <EditText android:id="@+id/etPulses" style="@style/Input" android:inputType="number" />
+
+            <TextView style="@style/SettingLabel" android:text="@string/set_weight" />
+            <EditText android:id="@+id/etWeight" style="@style/Input" android:inputType="numberDecimal" />
+
+            <TextView style="@style/SettingLabel" android:text="@string/set_interval" />
+            <EditText android:id="@+id/etInterval" style="@style/Input" android:inputType="number" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="@string/help"
+                android:textColor="@color/muted"
+                android:textSize="13sp" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

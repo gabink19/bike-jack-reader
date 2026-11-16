@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Bike Jack Reader</string>
+    <string name="lbl_speed">Kecepatan (km/j)</string>
+    <string name="lbl_rpm">Kayuhan (RPM)</string>
+    <string name="lbl_distance">Jarak (km)</string>
+    <string name="lbl_time">Waktu</string>
+    <string name="lbl_kcal">Kalori (perkiraan)</string>
+    <string name="lbl_avg">Rata-rata (km/j)</string>
+    <string name="lbl_signal">Sinyal sensor</string>
+    <string name="start">Mulai</string>
+    <string name="pause">Jeda</string>
+    <string name="resume">Lanjut</string>
+    <string name="reset">Reset</string>
+    <string name="settings_show">▸ Pengaturan &amp; kalibrasi</string>
+    <string name="settings_hide">▾ Pengaturan &amp; kalibrasi</string>
+    <string name="set_threshold">Ambang deteksi</string>
+    <string name="set_polarity">Polaritas pulsa</string>
+    <string name="pol_both">Dua arah</string>
+    <string name="pol_pos">Positif</string>
+    <string name="pol_neg">Negatif</string>
+    <string name="set_meters">Jarak per putaran (meter)</string>
+    <string name="set_pulses">Pulsa per putaran (jumlah magnet)</string>
+    <string name="set_weight">Berat badan (kg)</string>
+    <string name="set_interval">Jeda minimum antar pulsa (ms)</string>
+    <string name="help">Kalibrasi: kayuh pelan dan lihat grafik. Setiap putaran harus memunculkan lonjakan yang melewati garis oranye, dan titik hijau berkedip satu kali per putaran. Jika berkedip dua kali per putaran, pilih polaritas Positif atau Negatif. Jika tidak berkedip, turunkan ambang.\n\nAgar angka sama dengan console sepeda, ubah \"Jarak per putaran\": nilai baru = nilai lama × (jarak console ÷ jarak aplikasi).</string>
+    <string name="perm_denied">Izin mikrofon ditolak. Aplikasi butuh izin ini untuk membaca sensor lewat jack 3.5mm.</string>
+</resources>
