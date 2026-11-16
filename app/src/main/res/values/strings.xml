@@ -14,6 +14,11 @@
     <string name="reset">Reset</string>
     <string name="settings_show">▸ Pengaturan &amp; kalibrasi</string>
     <string name="settings_hide">▾ Pengaturan &amp; kalibrasi</string>
+    <string name="set_input">Sumber input</string>
+    <string name="in_auto">Otomatis</string>
+    <string name="in_jack">Jack</string>
+    <string name="in_usb">USB-C</string>
+    <string name="in_mic">Mic HP</string>
     <string name="set_threshold">Ambang deteksi</string>
     <string name="set_polarity">Polaritas pulsa</string>
     <string name="pol_both">Dua arah</string>

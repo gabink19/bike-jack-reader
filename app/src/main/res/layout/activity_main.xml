@@ -24,9 +24,21 @@
             android:id="@+id/tvStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
             android:textColor="@color/muted"
             android:textSize="13sp" />
+
+        <TextView style="@style/SettingLabel" android:layout_marginTop="8dp" android:text="@string/set_input" />
+        <RadioGroup
+            android:id="@+id/rgInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:orientation="horizontal">
+            <RadioButton android:id="@+id/rbInAuto" style="@style/Radio" android:text="@string/in_auto" />
+            <RadioButton android:id="@+id/rbInJack" style="@style/Radio" android:text="@string/in_jack" />
+            <RadioButton android:id="@+id/rbInUsb" style="@style/Radio" android:text="@string/in_usb" />
+            <RadioButton android:id="@+id/rbInMic" style="@style/Radio" android:text="@string/in_mic" />
+        </RadioGroup>
 
         <GridLayout
             android:layout_width="match_parent"

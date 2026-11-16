@@ -46,10 +46,26 @@ biasanya mendukung). Aplikasi otomatis memilih input USB.
 (1) console, (2) kabel di atas. Jika console jadi tidak stabil, tambahkan kapasitor 1–10 µF
 seri di antara titik sensor dan R2.
 
+## Sumber input
+
+Di bagian atas layar ada pilihan **Sumber input**:
+
+| Pilihan | Dipakai untuk |
+| --- | --- |
+| Otomatis | Jack 3.5mm jika terdeteksi, lalu USB-C, jika tidak ada pakai default sistem |
+| Jack | Memaksa input dari jack 3.5mm |
+| USB-C | Memaksa input dari adaptor USB-C ke 3.5mm |
+| Mic HP | Mic bawaan HP, untuk uji coba tanpa kabel (ketuk-ketuk dekat mic) |
+
+Status menampilkan perangkat yang **benar-benar** dipakai Android. Jika tertulis
+"... tidak terdeteksi", HP tidak mengenali perangkat itu sebagai input mic (cek R1).
+Jika tertulis "permintaan ... diabaikan sistem", HP memaksa rute lain; ini keterbatasan
+sebagian HP, coba pilihan lain atau cabut kabel lain yang terpasang.
+
 ## Kalibrasi di aplikasi
 
 1. Colok kabel, buka aplikasi, izinkan mikrofon. Status harus menampilkan `Input: Jack 3.5mm`
-   (atau USB). Kalau `Mic internal`, HP belum mengenali kabel (cek R1).
+   (atau USB-C). Kalau `Mic HP`, HP belum mengenali kabel (cek R1).
 2. Buka **Pengaturan & kalibrasi**, kayuh pelan. Grafik harus menunjukkan lonjakan tiap putaran
    dan titik hijau berkedip **satu kali per putaran**.
    - Tidak berkedip → turunkan *Ambang deteksi*.

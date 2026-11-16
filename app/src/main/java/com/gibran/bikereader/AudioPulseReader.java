@@ -22,8 +22,15 @@ public final class AudioPulseReader {
         void onError(String message);
     }
 
+    /** Sumber input yang dipilih pengguna. */
+    public enum InputChoice { AUTO, JACK, USB, BUILTIN }
+
     private static final String TAG = "AudioPulseReader";
     private static final int SAMPLE_RATE = 44100;
+    /** Cek perangkat yang benar-benar dipakai kira-kira tiap 1 detik (43 buffer x 1024 sampel). */
+    private static final int ROUTE_CHECK_EVERY = 43;
+
+    private volatile InputChoice inputChoice = InputChoice.AUTO;
 
     private final AudioManager audioManager;
     private final PulseDetector detector;
@@ -47,6 +54,59 @@ public final class AudioPulseReader {
 
     public boolean isRunning() {
         return running;
+    }
+
+    /** Berlaku saat start() berikutnya; pemanggil me-restart reader setelah mengubahnya. */
+    public void setInputChoice(InputChoice choice) {
+        inputChoice = choice == null ? InputChoice.AUTO : choice;
+    }
+
+    /** Mencari perangkat input sesuai pilihan. Null = biarkan Android memilih (default). */
+    private AudioDeviceInfo findDevice(InputChoice choice) {
+        if (audioManager == null) {
+            return null;
+        }
+        AudioDeviceInfo[] inputs = audioManager.getDevices(AudioManager.GET_DEVICES_INPUTS);
+        switch (choice) {
+            case JACK:
+                return firstOfType(inputs, AudioDeviceInfo.TYPE_WIRED_HEADSET);
+            case USB:
+                return firstOfType(inputs, AudioDeviceInfo.TYPE_USB_HEADSET, AudioDeviceInfo.TYPE_USB_DEVICE);
+            case BUILTIN:
+                return firstOfType(inputs, AudioDeviceInfo.TYPE_BUILTIN_MIC);
+            default:
+                return findExternalMic();
+        }
+    }
+
+    private static AudioDeviceInfo firstOfType(AudioDeviceInfo[] devices, int... types) {
+        for (int type : types) {
+            for (AudioDeviceInfo d : devices) {
+                if (d.getType() == type) {
+                    return d;
+                }
+            }
+        }
+        return null;
+    }
+
+    static String label(AudioDeviceInfo d) {
+        if (d == null) {
+            return "tidak diketahui";
+        }
+        switch (d.getType()) {
+            case AudioDeviceInfo.TYPE_WIRED_HEADSET:
+                return "Jack 3.5mm";
+            case AudioDeviceInfo.TYPE_USB_HEADSET:
+            case AudioDeviceInfo.TYPE_USB_DEVICE:
+                return "USB-C (" + d.getProductName() + ")";
+            case AudioDeviceInfo.TYPE_BUILTIN_MIC:
+                return "Mic HP";
+            case AudioDeviceInfo.TYPE_BLUETOOTH_SCO:
+                return "Bluetooth";
+            default:
+                return "Perangkat tipe " + d.getType();
+        }
     }
 
     public synchronized void start() {
@@ -104,13 +164,14 @@ public final class AudioPulseReader {
             return;
         }
         try {
-            AudioDeviceInfo ext = findExternalMic();
-            if (ext != null) {
-                record.setPreferredDevice(ext);
-                inputName = ext.getType() == AudioDeviceInfo.TYPE_WIRED_HEADSET
-                        ? "Jack 3.5mm" : "USB (" + ext.getProductName() + ")";
-            } else {
-                inputName = "Mic internal (kabel belum terdeteksi)";
+            InputChoice choice = inputChoice;
+            AudioDeviceInfo wanted = findDevice(choice);
+            String missing = null;
+            if (wanted != null) {
+                record.setPreferredDevice(wanted);
+            } else if (choice != InputChoice.AUTO) {
+                missing = choice == InputChoice.JACK ? "Jack 3.5mm"
+                        : choice == InputChoice.USB ? "USB-C" : "Mic HP";
             }
 
             detector.reset(SAMPLE_RATE);
@@ -118,7 +179,19 @@ public final class AudioPulseReader {
             record.startRecording();
 
             short[] buf = new short[1024];
+            int buffers = 0;
             while (running) {
+                if (buffers++ % ROUTE_CHECK_EVERY == 0) {
+                    // setPreferredDevice hanya permintaan; tampilkan perangkat yang benar-benar dipakai Android.
+                    AudioDeviceInfo routed = record.getRoutedDevice();
+                    String name = routed != null ? label(routed) : (wanted != null ? label(wanted) : "default sistem");
+                    if (missing != null) {
+                        name += " (" + missing + " tidak terdeteksi)";
+                    } else if (wanted != null && routed != null && routed.getType() != wanted.getType()) {
+                        name += " (permintaan " + label(wanted) + " diabaikan sistem)";
+                    }
+                    inputName = name;
+                }
                 int n = record.read(buf, 0, buf.length);
                 if (n < 0) {
                     fail("Error membaca audio: " + n);

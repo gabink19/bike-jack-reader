@@ -78,6 +78,7 @@ public final class MainActivity extends Activity implements AudioPulseReader.Lis
         prefs = new Prefs(this);
         applyPrefs();
         reader = new AudioPulseReader(this, detector, wave, this);
+        reader.setInputChoice(prefs.inputChoice);
 
         bindViews();
         setupSettings();
@@ -139,6 +140,23 @@ public final class MainActivity extends Activity implements AudioPulseReader.Lis
             public void onStopTrackingTouch(SeekBar seekBar) {
                 prefs.save();
             }
+        });
+
+        RadioGroup rgInput = findViewById(R.id.rgInput);
+        switch (prefs.inputChoice) {
+            case JACK: rgInput.check(R.id.rbInJack); break;
+            case USB: rgInput.check(R.id.rbInUsb); break;
+            case BUILTIN: rgInput.check(R.id.rbInMic); break;
+            default: rgInput.check(R.id.rbInAuto); break;
+        }
+        rgInput.setOnCheckedChangeListener((group, id) -> {
+            prefs.inputChoice = id == R.id.rbInJack ? AudioPulseReader.InputChoice.JACK
+                    : id == R.id.rbInUsb ? AudioPulseReader.InputChoice.USB
+                    : id == R.id.rbInMic ? AudioPulseReader.InputChoice.BUILTIN
+                    : AudioPulseReader.InputChoice.AUTO;
+            prefs.save();
+            reader.setInputChoice(prefs.inputChoice);
+            restartReaderIfAllowed();
         });
 
         RadioGroup rg = findViewById(R.id.rgPolarity);
@@ -257,7 +275,14 @@ public final class MainActivity extends Activity implements AudioPulseReader.Lis
     /** Kabel dicolok/dicabut: buka ulang AudioRecord agar input mengikuti perangkat baru. */
     private void onDevicesChanged() {
         boolean has = reader.findExternalMic() != null;
-        if (has == lastHadExternalMic || !visible
+        if (has == lastHadExternalMic) {
+            return;
+        }
+        restartReaderIfAllowed();
+    }
+
+    private void restartReaderIfAllowed() {
+        if (!visible
                 || checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             return;
         }

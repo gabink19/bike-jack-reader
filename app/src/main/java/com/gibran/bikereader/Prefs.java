@@ -17,6 +17,7 @@ public final class Prefs {
     public float threshold = 0.25f;
     public PulseDetector.Polarity polarity = PulseDetector.Polarity.BOTH;
     public int minIntervalMs = 120;
+    public AudioPulseReader.InputChoice inputChoice = AudioPulseReader.InputChoice.AUTO;
 
     private final SharedPreferences sp;
 
@@ -32,6 +33,11 @@ public final class Prefs {
         } catch (IllegalArgumentException e) {
             polarity = PulseDetector.Polarity.BOTH;
         }
+        try {
+            inputChoice = AudioPulseReader.InputChoice.valueOf(sp.getString("inputChoice", inputChoice.name()));
+        } catch (IllegalArgumentException e) {
+            inputChoice = AudioPulseReader.InputChoice.AUTO;
+        }
     }
 
     public void save() {
@@ -42,6 +48,7 @@ public final class Prefs {
                 .putFloat("threshold", threshold)
                 .putInt("minIntervalMs", minIntervalMs)
                 .putString("polarity", polarity.name())
+                .putString("inputChoice", inputChoice.name())
                 .apply();
     }
 
